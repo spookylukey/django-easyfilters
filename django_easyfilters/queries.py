@@ -77,7 +77,7 @@ def date_aggregation(date_qs):
         date_q.select = [SelectInfo(col=DateWithAlias(date_obj.col.col, date_obj.col.lookup_type), field=None)]
     else:
         date_q.select = [DateWithAlias(date_obj.col, date_obj.lookup_type)]
-    print date_q.select
+        
     # Now use as a subquery to do aggregation
     query = DateAggregateQuery(date_qs.model)
     query.add_subquery(date_q, date_qs.db)
