@@ -27,6 +27,8 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     "django.core.context_processors.request",
 ]
 
+MIDDLEWARE_CLASSES = []
+
 ROOT_URLCONF = 'django_easyfilters.tests.urls'
 
 DEBUG = True
