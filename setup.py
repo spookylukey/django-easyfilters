@@ -22,6 +22,7 @@ setup(
     name="django-easyfilters",
     version='0.6',
     packages=find_packages(),
+    include_package_data=True,
     author="Luke Plant",
     author_email="L.Plant.98@cantab.net",
     url="https://bitbucket.org/spookylukey/django-easyfilters/",
@@ -31,9 +32,6 @@ setup(
         + "\n\n" +
         read('CHANGES.rst')
     ),
-    package_data = {
-        'django_easyfilters': find_package_data('django_easyfilters', ['*.json', '*.html', '*.css', '*.js'])
-    },
     license = "MIT",
     keywords = "django filter autofilter drilldown easy simple",
     classifiers = [
