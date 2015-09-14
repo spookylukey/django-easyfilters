@@ -50,6 +50,9 @@ class FilterSet(object):
     def title(self):
         return self.make_title()
 
+    def __nonzero__(self):
+        return any(self.get_filter_choices(f.field) for f in self.filters)
+
     def get_filter_choices(self, filter_field):
         if not hasattr(self, '_cached_filter_choices'):
             self._cached_filter_choices = dict((f.field, f.get_choices(self.qs))

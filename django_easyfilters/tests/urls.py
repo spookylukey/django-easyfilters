@@ -1,5 +1,4 @@
 # URLs to make it easy to add more data for the test suite.
-
 from django.conf.urls import patterns, include
 from django.contrib import admin
 admin.autodiscover()

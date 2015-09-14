@@ -11,6 +11,7 @@ from django.db import models
 from django.utils import formats
 from django.utils.dates import MONTHS
 from django.utils.text import capfirst
+from django.db.models.fields import DateTimeField
 import six
 
 from django_easyfilters.queries import date_aggregation, value_counts, numeric_range_counts
@@ -663,7 +664,16 @@ class DateTimeFilter(RangeFilterMixin, Filter):
                 else:
                     range_type = YEAR
 
-            date_qs = qs.dates(self.field, range_type.label)
+            # API for `QuerySet.dates` used to return a list of `datetime` objects,
+            # but from Django 1.6 onwards, it returns a list of `date` objects instead.
+            # See: https://docs.djangoproject.com/en/1.6/releases/1.6/#queryset-dates-returns-date-objects
+            # for django under 1.6 id doesnt matter if field is DateField or DateTime field
+            # we need check it for django 1.6
+            if isinstance(self.field_obj, DateTimeField):
+                date_qs = (qs.datetimes(self.field, range_type.label) if hasattr(qs, 'datetimes') else
+                           qs.dates(self.field, range_type.label))
+            else:
+                date_qs = qs.dates(self.field, range_type.label)
             results = date_aggregation(date_qs)
 
             date_choice_counts = self.collapse_results(results, range_type)
