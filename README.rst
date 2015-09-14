@@ -2,6 +2,17 @@
 django-easyfilters
 ==================
 
+
+Status
+======
+
+This library is lacking a maintainer! I'm not actively using it any longer,
+which means that it is only getting the most basic fixes.
+
+If you would like to take over the project, please get in contact. (Providing
+fixes for the existing issues would be a good start for showing your ability to
+take it on :-).
+
 Overview
 ========
 
