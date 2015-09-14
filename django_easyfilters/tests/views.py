@@ -4,6 +4,7 @@ from django_easyfilters.tests.models import Book, Author
 from django_easyfilters import FilterSet
 from django_easyfilters.filters import NumericRangeFilter
 
+
 class BookFilterSet(FilterSet):
     fields = [
         'binding',
@@ -12,7 +13,8 @@ class BookFilterSet(FilterSet):
         'price',
         'date_published',
         'rating',
-        ]
+    ]
+
 
 def books(request):
     books = Book.objects.all()
@@ -22,10 +24,12 @@ def books(request):
                                           'title': "Books",
                                           })
 
+
 class AuthorFilterSet(FilterSet):
     fields = [
         ('likes', {}, NumericRangeFilter)
-        ]
+    ]
+
 
 def authors(request):
     authors = Author.objects.all()

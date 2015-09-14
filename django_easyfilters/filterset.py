@@ -1,13 +1,16 @@
-from django import template
-from django.template.loader import get_template
-from django.utils.safestring import mark_safe
-from django.utils.html import escape
-from django.utils.text import capfirst
 import six
 
-from django_easyfilters.filters import FILTER_ADD, FILTER_REMOVE, FILTER_DISPLAY, \
-    ValuesFilter, ChoicesFilter, ForeignKeyFilter, ManyToManyFilter, DateTimeFilter, NumericRangeFilter
-from django_easyfilters.utils import python_2_unicode_compatible
+from django import template
+from django.template.loader import get_template
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
+
+from .filters import (FILTER_DISPLAY, FILTER_REMOVE,
+                      ChoicesFilter, DateTimeFilter,
+                      ForeignKeyFilter, ManyToManyFilter,
+                      NumericRangeFilter, ValuesFilter)
+from .utils import python_2_unicode_compatible
 
 
 def non_breaking_spaces(val):
@@ -34,10 +37,10 @@ class cachedproperty(object):
 class FilterSet(object):
 
     # If the attribute "template" is provided (as a string), that will be
-    # preferred;  otherwise we use the specified template_file 
+    # preferred;  otherwise we use the specified template_file
     template = None
     template_file = "django-easyfilters/default.html"
-    
+
     title_fields = None
 
     def __init__(self, queryset, params):
@@ -69,7 +72,7 @@ class FilterSet(object):
         choices = self.get_filter_choices(filter_.field)
         ctx = {'filterlabel': capfirst(field_obj.verbose_name)}
         ctx['choices'] = [dict(label=non_breaking_spaces(c.label),
-                               url=u'?' + c.params.urlencode() \
+                               url=u'?' + c.params.urlencode()
                                    if c.link_type != FILTER_DISPLAY else None,
                                link_type=c.link_type,
                                count=c.count)

@@ -1,7 +1,7 @@
 import six
 
-# Copied from Django 1.5
 
+# Copied from Django 1.5
 def python_2_unicode_compatible(klass):
     """
     A decorator that defines __unicode__ and __str__ methods under Python 2.

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from datetime import date, timedelta
+from datetime import date
 from dateutil.relativedelta import relativedelta
 import math
 import operator
@@ -8,9 +8,7 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import formats
 from django.utils.dates import MONTHS
-from django.utils.text import capfirst
 from django.db.models.fields import DateTimeField
 import six
 
@@ -49,7 +47,7 @@ class Filter(object):
     and can apply the information from a URL to filter a QuerySet.
     """
 
-    ### Public interface ###
+    # -- Public interface --
 
     def __init__(self, field, model, params, query_param=None, order_by_count=False):
         self.field = field
@@ -85,7 +83,7 @@ class Filter(object):
         """
         raise NotImplementedError()
 
-    ### Methods that are used by base implementation above ###
+    # -- Methods that are used by base implementation above --
 
     def choices_from_params(self):
         out = []
@@ -114,7 +112,7 @@ class Filter(object):
         """
         return {self.field: choice}
 
-    ### Utility methods needed by most/all subclasses ###
+    # -- Utility methods needed by most/all subclasses --
 
     def param_from_choice(self, choice):
         return six.text_type(choice)
@@ -143,7 +141,7 @@ class Filter(object):
             params.setlist(self.query_param, self.paramlist_from_choices(chosen))
         else:
             del params[self.query_param]
-        params.pop('page', None) # links should reset paging
+        params.pop('page', None)  # links should reset paging
         return params
 
     def sort_choices(self, qs, choices):
@@ -164,7 +162,7 @@ class Filter(object):
         choices = []
         for choice in chosen:
             choices.append(FilterChoice(self.render_choice_object(choice),
-                                        None, # Don't need count for removing
+                                        None,  # Don't need count for removing
                                         self.build_params(remove=[choice]),
                                         FILTER_REMOVE))
         return choices
@@ -291,7 +289,7 @@ class RangeFilterMixin(ChooseAgainMixin):
         return out
 
 
-### Concrete filter classes that are used by FilterSet ###
+# -- Concrete filter classes that are used by FilterSet --
 
 class ValuesFilter(ChooseOnceMixin, SimpleQueryMixin, Filter):
     """
@@ -392,7 +390,7 @@ class ManyToManyFilter(ChooseAgainMixin, RelatedObjectMixin, Filter):
 
         # We need to limit items by what is in the main QuerySet (which might
         # already be filtered).
-        m2m_objs = through.objects.filter(**{fkey_this.name + '__in':qs})
+        m2m_objs = through.objects.filter(**{fkey_this.name + '__in': qs})
 
         # We need to exclude items in other table that we have already filtered
         # on, because they are not interesting.
@@ -436,7 +434,7 @@ class ManyToManyFilter(ChooseAgainMixin, RelatedObjectMixin, Filter):
 @total_ordering
 class DateRangeType(object):
 
-    all = {} # Keep a cache, so that we have unique instances
+    all = {}  # Keep a cache, so that we have unique instances
 
     def __init__(self, level, single, label, regex):
         self.level, self.single, self.label = level, single, label
@@ -594,7 +592,7 @@ class DateChoice(object):
         end_date = end_date + relativedelta(**{self.range_type.relativedeltaattr: 1})
 
         return {field_name + '__gte': start_date,
-                field_name + '__lt':  end_date}
+                field_name + '__lt': end_date}
 
 
 class DateTimeFilter(RangeFilterMixin, Filter):
@@ -629,7 +627,7 @@ class DateTimeFilter(RangeFilterMixin, Filter):
                                     FILTER_REMOVE))
             # There can be cases where there are gaps, so we need to bridge
             # using FILTER_DISPLAY
-            out.extend(self.bridge_choices(chosen[0:i+1], chosen[i+1:]))
+            out.extend(self.bridge_choices(chosen[0:i + 1], chosen[i + 1:]))
         return out
 
     def get_choices_add(self, qs):
@@ -735,14 +733,14 @@ class DateTimeFilter(RangeFilterMixin, Filter):
                 last = results[-1][0].year
 
             # We need to split into even sized buckets, so it looks nice.
-            span =  last - first + 1
+            span = last - first + 1
             bucketsize = int(math.ceil(float(span) / self.max_links))
             numbuckets = int(math.ceil(float(span) / bucketsize))
 
             buckets = [[] for i in range(numbuckets)]
             for row in results:
                 val = getattr(row[0], range_type.dateattr)
-                bucketnum = int(math.floor(float(val - first)/bucketsize))
+                bucketnum = int(math.floor(float(val - first) / bucketsize))
                 buckets[bucketnum].append(row)
 
             dt_template = results[0][0]
@@ -812,7 +810,6 @@ class RangeEnd(object):
         self.value, self.inclusive = value, inclusive
 
 
-
 def make_numeric_range_choice(to_python, to_str):
     """
     Returns a Choice class that represents a numeric choice range,
@@ -859,7 +856,6 @@ def make_numeric_range_choice(to_python, to_str):
 
         def __repr__(self):
             return '<NumericRangeChoice %s>' % self
-
 
         def __eq__(self, other):
             return self.__cmp__(other) == 0
@@ -912,7 +908,6 @@ class NumericRangeFilter(RangeFilterMixin, SingleValueMixin, Filter):
 
     def get_choices_add(self, qs):
         chosen = list(self.chosen)
-        range_type = None
 
         if not self.drilldown and len(chosen) > 0:
             return []

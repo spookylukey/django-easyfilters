@@ -6,7 +6,7 @@ from django.db.models.sql.datastructures import Date
 from django.db.models.sql.subqueries import AggregateQuery
 from django.utils.datastructures import SortedDict
 
-#try to import SelectInfo, appeared in django 1.6
+# try to import SelectInfo, appeared in django 1.6
 try:
     from django.db.models.sql.constants import SelectInfo
 except ImportError:
@@ -43,9 +43,9 @@ class DateAggregateCompiler(SQLCompiler):
 
     def as_sql(self, qn=None):
         sql = ('SELECT %s, COUNT(%s) FROM (%s) subquery GROUP BY (%s) ORDER BY (%s)' % (
-                DateWithAlias.alias, DateWithAlias.alias, self.query.subquery,
-                DateWithAlias.alias, DateWithAlias.alias)
-               )
+            DateWithAlias.alias, DateWithAlias.alias, self.query.subquery,
+            DateWithAlias.alias, DateWithAlias.alias)
+        )
         params = self.query.sub_params
         return (sql, params)
 
@@ -55,7 +55,7 @@ class DateWithAlias(Date):
 
     def as_sql(self, qn, connection):
         date = super(DateWithAlias, self).as_sql(qn, connection)
-        #since django 1.6 returns tuple not string, so we need to use check
+        # Django 1.6 returns tuple not string, so we need to use check
         if isinstance(date, (list, tuple)):
             return date[0] + ' as ' + self.alias, date[1]
         return date + ' as ' + self.alias
@@ -72,12 +72,12 @@ def date_aggregation(date_qs):
     # Replace 'select' to add an alias
     date_obj = date_q.select[0]
 
-    #if it is django 1.6 generates new Select INfo object else the sane as at previous version
+    # If it is django 1.6 generates new SelectInfo object
     if SelectInfo and isinstance(date_obj, SelectInfo):
         date_q.select = [SelectInfo(col=DateWithAlias(date_obj.col.col, date_obj.col.lookup_type), field=None)]
     else:
         date_q.select = [DateWithAlias(date_obj.col, date_obj.lookup_type)]
-        
+
     # Now use as a subquery to do aggregation
     query = DateAggregateQuery(date_qs.model)
     query.add_subquery(date_q, date_qs.db)
@@ -100,7 +100,7 @@ def value_counts(qs, fieldname):
 class NumericAggregateQuery(AggregateQuery):
     # Need to override to return a compiler not in django.db.models.sql.compiler
     def get_compiler(self, using=None, connection=None):
-        return  NumericAggregateCompiler(self, connection, using)
+        return NumericAggregateCompiler(self, connection, using)
 
     def get_counts(self, using):
         from django.db import connections
@@ -116,15 +116,16 @@ class NumericAggregateCompiler(SQLCompiler):
 
     def as_sql(self, qn=None):
         sql = ('SELECT %s, COUNT(%s) FROM (%s) subquery GROUP BY (%s) ORDER BY (%s)' % (
-                NumericValueRange.alias, NumericValueRange.alias, self.query.subquery,
-                NumericValueRange.alias, NumericValueRange.alias)
-               )
+            NumericValueRange.alias, NumericValueRange.alias, self.query.subquery,
+            NumericValueRange.alias, NumericValueRange.alias)
+        )
         params = self.query.sub_params
         return (sql, params)
 
 
 class NumericValueRange(object):
     alias = 'easyfilter_number_range_alias'
+
     def __init__(self, col, ranges):
         # ranges is list of (lower, upper) bounds we want to find, where 'lower'
         # is inclusive and upper is exclusive.
@@ -169,4 +170,3 @@ def numeric_range_counts(qs, fieldname, ranges):
             r = ranges[-1]
         count_dict[r] = count
     return count_dict
-

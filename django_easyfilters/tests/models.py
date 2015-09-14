@@ -8,6 +8,7 @@ BINDING_CHOICES = [
     ('C', 'Cloth'),
 ]
 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=50)
@@ -49,4 +50,3 @@ class Book(models.Model):
 class Person(models.Model):
     date_of_birth = models.DateField()
     name = models.CharField(max_length=50)
-

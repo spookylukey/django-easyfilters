@@ -1,10 +1,11 @@
 # admin registration to make it easy to add more data for the test suite.
 from __future__ import unicode_literals
 
-from .models import *
 from django.contrib import admin
-
 from six import text_type
+
+from .models import Author, Book, Genre
+
 
 class BookAdmin(admin.ModelAdmin):
     def authors(obj):
