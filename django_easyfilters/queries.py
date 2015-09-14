@@ -1,3 +1,5 @@
+import django
+
 from django.db import models
 from django.db.backends.util import typecast_timestamp
 from django.db.models.sql.compiler import SQLCompiler
@@ -136,26 +138,43 @@ class NumericValueRange(object):
 
     def as_sql(self, qn, connection):
         if isinstance(self.col, (list, tuple)):
-            col = '%s.%s' % tuple([qn(c) for c in self.col])
+            if hasattr(self.col, 'col'):
+                col = self.col.col
+            else:
+                col = self.col
+            col = '%s.%s' % tuple([qn(c) for c in col])
         else:
             col = self.col
 
         # Build up case expression.
-        clause = (['CASE '] +
-                  ['WHEN %s > %s AND %s <= %s THEN %s ' % (col, val[0], col, val[1], i)
-                   for i, val in enumerate(self.ranges)] +
-                  # An inclusive lower limit for the first item in ranges:
-                  ['WHEN %s = %s THEN 0 ' % (col, self.ranges[0][0])] +
-                  ['ELSE %s END ' % len(self.ranges)] +
-                  ['as %s' % self.alias])
-        return ''.join(clause)
+        sql = ''.join(['CASE '] +
+                      ['WHEN %s > %%s AND %s <= %%s THEN %%s ' %
+                       (col, col) for val in self.ranges] +
+                      # An inclusive lower limit for the first item in ranges:
+                      [('WHEN %s = %%s THEN 0 ' % col) +
+                       ('ELSE %s END ') +
+                       ('as %s' % self.alias)])
+
+        params = []
+        for i, val in enumerate(self.ranges):
+            params.extend([val[0], val[1], i])
+        params.extend([self.ranges[0][0], len(self.ranges)])
+
+        if django.VERSION < (1, 6):
+            return sql % tuple(params)
+        else:
+            return sql, params
 
 
 def numeric_range_counts(qs, fieldname, ranges):
-
     # Build the query:
     query = qs.values_list(fieldname).query.clone()
-    query.select[0] = NumericValueRange(query.select[0], ranges)
+
+    select_obj = query.select[0]
+    if SelectInfo and isinstance(select_obj, SelectInfo):
+        query.select = [SelectInfo(col=NumericValueRange(select_obj, ranges), field=None)]
+    else:
+        query.select[0] = NumericValueRange(select_obj, ranges)
 
     agg_query = NumericAggregateQuery(qs.model)
     agg_query.add_subquery(query, qs.db)
