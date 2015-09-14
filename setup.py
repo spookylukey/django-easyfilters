@@ -20,7 +20,7 @@ def find_package_data(pkg, filetypes):
 
 setup(
     name="django-easyfilters",
-    version='0.6pre',
+    version='0.6',
     packages=find_packages(),
     author="Luke Plant",
     author_email="L.Plant.98@cantab.net",
@@ -42,7 +42,6 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 2.5",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.3",
