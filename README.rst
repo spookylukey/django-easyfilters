@@ -40,9 +40,6 @@ Demo
 
 A small demo app is included, see the instructions in docs/develop.rst
 
-A (currently) live example can be seen at:
-
-http://www.christchurchbradford.org.uk/sermons/
 
 Status
 ======
