@@ -50,12 +50,7 @@ extensive. Feedback regarding API or features is very welcome!
 Support
 =======
 
-File bugs/feature request in the 'issues' in BitBucket:
-
-https://bitbucket.org/spookylukey/django-easyfilters/issues?status=new&status=open
-
-Or drop `me <http://lukeplant.me.uk/>`_ an email, I always like to hear when
-people are using my stuff.
+File bugs/feature request in GitHub Issues.
 
 TODO
 ====
